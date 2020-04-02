@@ -3181,7 +3181,7 @@ sections:
 
       The default search path is the search path given to the `-L`
       command-line option, else `["~/.jq", "$ORIGIN/../lib/jq",
-      "$ORIGIN/../lib"]`.
+      "$ORIGIN/lib"]`.
 
       Null and empty string path elements terminate search path
       processing.
