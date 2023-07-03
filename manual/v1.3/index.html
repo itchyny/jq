@@ -290,7 +290,7 @@ the value at the key "foo", or null if there's none present.</p>
                     
                   </h3>
                   <p>You can also look up fields of an object using syntax like
-<code>.["foo"]</code> (.foo above is a shorthand version of this). This
+<code>.["foo"]</code> (<code>.foo</code> above is a shorthand version of this). This
 one works for arrays as well, if the key is an
 integer. Arrays are zero-based (like javascript), so <code>.[2]</code>
 returns the third element of the array.</p>
@@ -624,9 +624,9 @@ values take an input and produce an output - <code>42</code> is a valid jq
 expression that takes an input, ignores it, and returns 42
 instead.</p>
               
-                <section id="Arrayconstruction-[]">
+                <section id="Arrayconstruction:[]">
                   <h3>
-                    Array construction - <code>[]</code>
+                    Array construction: <code>[]</code>
                     
                   </h3>
                   <p>As in JSON, <code>[]</code> is used to construct arrays, as in
@@ -673,9 +673,9 @@ array of four elements.</p>
                   
                 </section>
               
-                <section id="Objects-{}">
+                <section id="Objects:{}">
                   <h3>
-                    Objects - <code>{}</code>
+                    Objects: <code>{}</code>
                     
                   </h3>
                   <p>Like JSON, <code>{}</code> is for constructing objects (aka
@@ -768,15 +768,15 @@ expression. With the same input as above,</p>
           
             <section id="Builtinoperatorsandfunctions">
               <h2>Builtin operators and functions</h2>
-              <p>Some jq operator (for instance, <code>+</code>) do different things
+              <p>Some jq operators (for instance, <code>+</code>) do different things
 depending on the type of their arguments (arrays, numbers,
 etc.). However, jq never does implicit type conversions. If you
 try to add a string to an object you'll get an error message and
 no result.</p>
               
-                <section id="Addition-+">
+                <section id="Addition:+">
                   <h3>
-                    Addition - <code>+</code>
+                    Addition: <code>+</code>
                     
                   </h3>
                   <p>The operator <code>+</code> takes two filters, applies them both
@@ -886,9 +886,9 @@ value unchanged.</p>
                   
                 </section>
               
-                <section id="Subtraction--">
+                <section id="Subtraction:-">
                   <h3>
-                    Subtraction - <code>-</code>
+                    Subtraction: <code>-</code>
                     
                   </h3>
                   <p>As well as normal arithmetic subtraction on numbers, the <code>-</code>
@@ -937,9 +937,9 @@ the second array's elements from the first array.</p>
                   
                 </section>
               
-                <section id="Multiplication,division-*and/">
+                <section id="Multiplication,division:*and/">
                   <h3>
-                    Multiplication, division - <code>*</code> and <code>/</code>
+                    Multiplication, division: <code>*</code> and <code>/</code>
                     
                   </h3>
                   <p>These operators only work on numbers, and do the expected.</p>
@@ -1156,9 +1156,9 @@ will be faster.</p>
                   
                 </section>
               
-                <section id="to_entries,from_entries,with_entries">
+                <section id="to_entries,from_entries,with_entries(f)">
                   <h3>
-                    <code>to_entries</code>, <code>from_entries</code>, <code>with_entries</code>
+                    <code>to_entries</code>, <code>from_entries</code>, <code>with_entries(f)</code>
                     
                   </h3>
                   <p>These functions convert between an object and an array of
@@ -1166,9 +1166,9 @@ key-value pairs. If <code>to_entries</code> is passed an object, then
 for each <code>k: v</code> entry in the input, the output array
 includes <code>{"key": k, "value": v}</code>.</p>
 <p><code>from_entries</code> does the opposite conversion, and
-<code>with_entries(foo)</code> is a shorthand for <code>to_entries |
-map(foo) | from_entries</code>, useful for doing some operation to
-all keys and values of an object.</p>
+<code>with_entries(f)</code> is a shorthand for <code>to_entries | map(f) |
+from_entries</code>, useful for doing some operation to all keys
+and values of an object.</p>
 
                   
                     <div>
@@ -1322,15 +1322,15 @@ will give you <code>[3]</code>.</p>
                   
                 </section>
               
-                <section id="map(x)">
+                <section id="map(f)">
                   <h3>
-                    <code>map(x)</code>
+                    <code>map(f)</code>
                     
                   </h3>
-                  <p>For any filter <code>x</code>, <code>map(x)</code> will run that filter for each
+                  <p>For any filter <code>f</code>, <code>map(f)</code> will run that filter for each
 element of the input array, and produce the outputs a new
 array. <code>map(.+1)</code> will increment each element of an array of numbers.</p>
-<p><code>map(x)</code> is equivalent to <code>[.[] | x]</code>. In fact, this is how
+<p><code>map(f)</code> is equivalent to <code>[.[] | f]</code>. In fact, this is how
 it's defined.</p>
 
                   
@@ -1622,7 +1622,7 @@ or object.</p>
               
                 <section id="sort,sort_by">
                   <h3>
-                    <code>sort, sort_by</code>
+                    <code>sort</code>, <code>sort_by</code>
                     
                   </h3>
                   <p>The <code>sort</code> functions sorts its input, which must be an
@@ -2022,9 +2022,9 @@ with:</p>
                   
                 </section>
               
-                <section id="Stringinterpolation-\(foo)">
+                <section id="Stringinterpolation:\(exp)">
                   <h3>
-                    String interpolation - <code>\(foo)</code>
+                    String interpolation: <code>\(exp)</code>
                     
                   </h3>
                   <p>Inside a string, you can put an expression inside parens
@@ -2173,8 +2173,8 @@ not escaped, as they were part of the string literal.</p>
                   <p>The expression 'a == b' will produce 'true' if the result of a and b
 are equal (that is, if they represent equivalent JSON documents) and
 'false' otherwise. In particular, strings are never considered equal
-to numbers. If you're coming from Javascript, jq's == is like
-Javascript's === - considering values equal only when they have the
+to numbers. If you're coming from JavaScript, jq's == is like
+JavaScript's === - considering values equal only when they have the
 same type as well as the same value.</p>
 <p>!= is "not equal", and 'a != b' returns the opposite value of 'a == b'</p>
 
@@ -2227,16 +2227,16 @@ same type as well as the same value.</p>
                   
                 </section>
               
-                <section id="if-then-else">
+                <section id="if-then-else-end">
                   <h3>
-                    if-then-else
+                    if-then-else-end
                     
                   </h3>
                   <p><code>if A then B else C end</code> will act the same as <code>B</code> if <code>A</code>
 produces a value other than false or null, but act the same
 as <code>C</code> otherwise.</p>
 <p>Checking for false or null is a simpler notion of
-"truthiness" than is found in Javascript or Python, but it
+"truthiness" than is found in JavaScript or Python, but it
 means that you'll sometimes have to be more explicit about
 the condition you want: you can't test whether, e.g. a
 string is empty using <code>if .name then A else B end</code>, you'll
@@ -2283,7 +2283,7 @@ end'</td></tr>
               
                 <section id="&gt;,&gt;=,&lt;=,&lt;">
                   <h3>
-                    <code>&gt;, &gt;=, &lt;=, &lt;</code>
+                    <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;=</code>, <code>&lt;</code>
                     
                   </h3>
                   <p>The comparison operators <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;=</code>, <code>&lt;</code> return whether
@@ -2320,26 +2320,27 @@ to, less than or equal to or less than their right argument
                   
                 </section>
               
-                <section id="and/or/not">
+                <section id="and,or,not">
                   <h3>
-                    and/or/not
+                    <code>and</code>, <code>or</code>, <code>not</code>
                     
                   </h3>
-                  <p>jq supports the normal Boolean operators and/or/not. They have the
-same standard of truth as if expressions - false and null are
-considered "false values", and anything else is a "true value".</p>
+                  <p>jq supports the normal Boolean operators <code>and</code>, <code>or</code>, <code>not</code>.
+They have the same standard of truth as if expressions -
+<code>false</code> and <code>null</code> are considered "false values", and
+anything else is a "true value".</p>
 <p>If an operand of one of these operators produces multiple
 results, the operator itself will produce a result for each input.</p>
 <p><code>not</code> is in fact a builtin function rather than an operator,
 so it is called as a filter to which things can be piped
 rather than with special syntax, as in <code>.foo and .bar |
 not</code>.</p>
-<p>These three only produce the values "true" and "false", and
+<p>These three only produce the values <code>true</code> and <code>false</code>, and
 so are only useful for genuine Boolean operations, rather
 than the common Perl/Python/Ruby idiom of
 "value_that_may_be_null or default". If you want to use this
 form of "or", picking between two values rather than
-evaluating a condition, see the "//" operator below.</p>
+evaluating a condition, see the <code>//</code> operator below.</p>
 
                   
                     <div>
@@ -2439,9 +2440,9 @@ evaluating a condition, see the "//" operator below.</p>
                   
                 </section>
               
-                <section id="Alternativeoperator-//">
+                <section id="Alternativeoperator://">
                   <h3>
-                    Alternative operator - <code>//</code>
+                    Alternative operator: <code>//</code>
                     
                   </h3>
                   <p>A filter of the form <code>a // b</code> produces the same
@@ -2544,14 +2545,14 @@ variables actually makes our lives easier.</p>
 <p>Suppose we have an array of blog posts, with "author" and "title"
 fields, and another object which is used to map author usernames to
 real names. Our input looks like:</p>
-<pre><code>{"posts": [{"title": "Frist psot", "author": "anon"},
+<pre><code>{"posts": [{"title": "First post", "author": "anon"},
            {"title": "A well-written article", "author": "person1"}],
  "realnames": {"anon": "Anonymous Coward",
                "person1": "Person McPherson"}}
 </code></pre>
 <p>We want to produce the posts with the author field containing a real
 name, as in:</p>
-<pre><code>{"title": "Frist psot", "author": "Anonymous Coward"}
+<pre><code>{"title": "First post", "author": "Anonymous Coward"}
 {"title": "A well-written article", "author": "Person McPherson"}
 </code></pre>
 <p>We use a variable, $names, to store the realnames object, so that we
@@ -2725,7 +2726,7 @@ same object" or "not the same object".</p>
 <p>If an object has two fields which are arrays, <code>.foo</code> and <code>.bar</code>,
 and you append something to <code>.foo</code>, then <code>.bar</code> will not get
 bigger. Even if you've just set <code>.bar = .foo</code>. If you're used to
-programming in languages like Python, Java, Ruby, Javascript,
+programming in languages like Python, Java, Ruby, JavaScript,
 etc. then you can think of it as though jq does a full deep copy
 of every object before it does the assignment (for performance,
 it doesn't actually do that, but that's the general idea).</p>
@@ -2741,7 +2742,7 @@ and produce as output an object with the "foo" field set to
 in jq - all jq values are immutable. For instance,</p>
 <p>.foo = .bar | .foo.baz = 1</p>
 <p>will not have the side-effect of setting .bar.baz to be set
-to 1, as the similar-looking program in Javascript, Python,
+to 1, as the similar-looking program in JavaScript, Python,
 Ruby or other languages would. Unlike these languages (but
 like Haskell and some other functional languages), there is
 no notion of two arrays or objects being "the same array" or
@@ -2894,19 +2895,19 @@ that we did before:</p>
           ,
         
           
-            "Array construction - []" : "Arrayconstruction-[]",
+            "Array construction: []" : "Arrayconstruction:[]",
           
-            "Objects - {}" : "Objects-{}",
+            "Objects: {}" : "Objects:{}",
           
           "Types and Values" : "TypesandValues"
           ,
         
           
-            "Addition - +" : "Addition-+",
+            "Addition: +" : "Addition:+",
           
-            "Subtraction - -" : "Subtraction--",
+            "Subtraction: -" : "Subtraction:-",
           
-            "Multiplication, division - * and /" : "Multiplication,division-*and/",
+            "Multiplication, division: * and /" : "Multiplication,division:*and/",
           
             "length" : "length",
           
@@ -2914,13 +2915,13 @@ that we did before:</p>
           
             "has" : "has",
           
-            "to_entries, from_entries, with_entries" : "to_entries,from_entries,with_entries",
+            "to_entries, from_entries, with_entries(f)" : "to_entries,from_entries,with_entries(f)",
           
             "select" : "select",
           
             "empty" : "empty",
           
-            "map(x)" : "map(x)",
+            "map(f)" : "map(f)",
           
             "add" : "add",
           
@@ -2946,7 +2947,7 @@ that we did before:</p>
           
             "recurse" : "recurse",
           
-            "String interpolation - \\(foo)" : "Stringinterpolation-\\(foo)",
+            "String interpolation: \\(exp)" : "Stringinterpolation:\\(exp)",
           
             "Format strings and escaping" : "Formatstringsandescaping",
           
@@ -2956,13 +2957,13 @@ that we did before:</p>
           
             "==, !=" : "==,!=",
           
-            "if-then-else" : "if-then-else",
+            "if-then-else-end" : "if-then-else-end",
           
             "\u003e, \u003e=, \u003c=, \u003c" : "\u003e,\u003e=,\u003c=,\u003c",
           
-            "and/or/not" : "and/or/not",
+            "and, or, not" : "and,or,not",
           
-            "Alternative operator - //" : "Alternativeoperator-//",
+            "Alternative operator: //" : "Alternativeoperator://",
           
           "Conditionals and Comparisons" : "ConditionalsandComparisons"
           ,
