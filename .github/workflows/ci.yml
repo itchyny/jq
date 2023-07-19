@@ -3,123 +3,124 @@ on:
   push:
     branches:
       - master
+      - no-color-debug
     tags:
       - "jq-*"
   pull_request:
 
 jobs:
-  linux:
-    strategy:
-      fail-fast: false
-      matrix:
-        arch:
-          - amd64
-          - arm64
-          - armel
-          - armhf
-          - i386
-          - mips
-          - mips64
-          - mips64el
-          - mips64r6
-          - mips64r6el
-          - mipsel
-          - mipsr6
-          - mipsr6el
-          - powerpc
-          - ppc64el
-          - riscv64
-          - s390x
-        include:
-          - arch: amd64
-            CC: x86_64-linux-gnu
-          - arch: arm64
-            CC: aarch64-linux-gnu
-          - arch: armel
-            CC: arm-linux-gnueabi
-          - arch: armhf
-            CC: arm-linux-gnueabihf
-          - arch: i386
-            CC: i686-linux-gnu
-          - arch: mips
-            CC: mips-linux-gnu
-          - arch: mips64
-            CC: mips64-linux-gnuabi64
-          - arch: mips64el
-            CC: mips64el-linux-gnuabi64
-          - arch: mips64r6
-            CC: mipsisa64r6-linux-gnuabi64
-          - arch: mips64r6el
-            CC: mipsisa64r6el-linux-gnuabi64
-          - arch: mipsel
-            CC: mipsel-linux-gnu
-          - arch: mipsr6
-            CC: mipsisa32r6-linux-gnu
-          - arch: mipsr6el
-            CC: mipsisa32r6el-linux-gnu
-          - arch: powerpc
-            CC: powerpc-linux-gnu
-          - arch: ppc64el
-            CC: powerpc64le-linux-gnu
-          - arch: riscv64
-            CC: riscv64-linux-gnu
-          - arch: s390x
-            CC: s390x-linux-gnu
-    runs-on: ubuntu-22.04
-    env:
-      AR: ${{ matrix.CC }}-ar
-      CHOST: ${{ matrix.cc }}
-      CC: ${{ matrix.cc }}-gcc
-      CPP: ${{ matrix.cc }}-cpp
-      CXX: ${{ matrix.cc }}-g++
-      LDFLAGS: -s
-      SUFFIX: linux-${{ matrix.arch }}
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-      - name: Install packages
-        run: |
-          sudo apt-get update
-          sudo apt-get upgrade
-          sudo apt-get install -y automake autoconf libtool crossbuild-essential-${{ matrix.arch }}
-      - name: Build
-        run: |
-          autoreconf -i
-          ./configure \
-            --host=${{ matrix.CC }} \
-            --disable-docs \
-            --disable-maintainer-mode \
-            --disable-valgrind \
-            --with-oniguruma=builtin \
-            --enable-static \
-            --enable-all-static
-          make -j"$(nproc)"
-          file ./jq
-          cp ./jq jq-${{ env.SUFFIX }}
-      - name: Test
-        # Only run tests for amd64 matching the CI machine arch
-        if: ${{ matrix.arch == 'amd64' }}
-        run: |
-          make check
-          git diff --exit-code
-      - name: Upload Test Logs
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-logs-${{ env.SUFFIX }}
-          retention-days: 7
-          path: |
-            test-suite.log
-            tests/*.log
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: jq-linux
-          path: jq-${{ env.SUFFIX }}
-          if-no-files-found: error
-          retention-days: 7
+  # linux:
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       arch:
+  #         - amd64
+  #         - arm64
+  #         - armel
+  #         - armhf
+  #         - i386
+  #         - mips
+  #         - mips64
+  #         - mips64el
+  #         - mips64r6
+  #         - mips64r6el
+  #         - mipsel
+  #         - mipsr6
+  #         - mipsr6el
+  #         - powerpc
+  #         - ppc64el
+  #         - riscv64
+  #         - s390x
+  #       include:
+  #         - arch: amd64
+  #           CC: x86_64-linux-gnu
+  #         - arch: arm64
+  #           CC: aarch64-linux-gnu
+  #         - arch: armel
+  #           CC: arm-linux-gnueabi
+  #         - arch: armhf
+  #           CC: arm-linux-gnueabihf
+  #         - arch: i386
+  #           CC: i686-linux-gnu
+  #         - arch: mips
+  #           CC: mips-linux-gnu
+  #         - arch: mips64
+  #           CC: mips64-linux-gnuabi64
+  #         - arch: mips64el
+  #           CC: mips64el-linux-gnuabi64
+  #         - arch: mips64r6
+  #           CC: mipsisa64r6-linux-gnuabi64
+  #         - arch: mips64r6el
+  #           CC: mipsisa64r6el-linux-gnuabi64
+  #         - arch: mipsel
+  #           CC: mipsel-linux-gnu
+  #         - arch: mipsr6
+  #           CC: mipsisa32r6-linux-gnu
+  #         - arch: mipsr6el
+  #           CC: mipsisa32r6el-linux-gnu
+  #         - arch: powerpc
+  #           CC: powerpc-linux-gnu
+  #         - arch: ppc64el
+  #           CC: powerpc64le-linux-gnu
+  #         - arch: riscv64
+  #           CC: riscv64-linux-gnu
+  #         - arch: s390x
+  #           CC: s390x-linux-gnu
+  #   runs-on: ubuntu-22.04
+  #   env:
+  #     AR: ${{ matrix.CC }}-ar
+  #     CHOST: ${{ matrix.cc }}
+  #     CC: ${{ matrix.cc }}-gcc
+  #     CPP: ${{ matrix.cc }}-cpp
+  #     CXX: ${{ matrix.cc }}-g++
+  #     LDFLAGS: -s
+  #     SUFFIX: linux-${{ matrix.arch }}
+  #   steps:
+  #     - name: Clone repository
+  #       uses: actions/checkout@v3
+  #       with:
+  #         submodules: true
+  #     - name: Install packages
+  #       run: |
+  #         sudo apt-get update
+  #         sudo apt-get upgrade
+  #         sudo apt-get install -y automake autoconf libtool crossbuild-essential-${{ matrix.arch }}
+  #     - name: Build
+  #       run: |
+  #         autoreconf -i
+  #         ./configure \
+  #           --host=${{ matrix.CC }} \
+  #           --disable-docs \
+  #           --disable-maintainer-mode \
+  #           --disable-valgrind \
+  #           --with-oniguruma=builtin \
+  #           --enable-static \
+  #           --enable-all-static
+  #         make -j"$(nproc)"
+  #         file ./jq
+  #         cp ./jq jq-${{ env.SUFFIX }}
+  #     - name: Test
+  #       # Only run tests for amd64 matching the CI machine arch
+  #       if: ${{ matrix.arch == 'amd64' }}
+  #       run: |
+  #         make check
+  #         git diff --exit-code
+  #     - name: Upload Test Logs
+  #       if: ${{ failure() }}
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: test-logs-${{ env.SUFFIX }}
+  #         retention-days: 7
+  #         path: |
+  #           test-suite.log
+  #           tests/*.log
+  #     - name: Upload artifacts
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: jq-linux
+  #         path: jq-${{ env.SUFFIX }}
+  #         if-no-files-found: error
+  #         retention-days: 7
 
   macos:
     strategy:
@@ -169,6 +170,7 @@ jobs:
         # Only run tests for amd64 matching the CI machine arch
         if: ${{ matrix.arch == 'amd64' }}
         run: |
+          script -q /dev/null ./jq -n -C . /dev/null | xxd
           make check
           git diff --exit-code
       - name: Upload Test Logs
@@ -188,191 +190,191 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  windows:
-    strategy:
-      fail-fast: false
-      matrix:
-        arch:
-          - amd64
-          - i386
-        include:
-          - arch: amd64
-            CC: x86_64-pc-msys
-            toolchain: gcc
-            msystem: msys
-          - arch: i386
-            CC: i686-w64-mingw32
-            toolchain: mingw-w64-i686-toolchain
-            msystem: mingw32
-    runs-on: windows-2022
-    env:
-      CHOST: ${{ matrix.CC }}
-      CC: ${{ matrix.CC }}-gcc
-      LDFLAGS: -s
-      SUFFIX: windows-${{ matrix.arch }}
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-      - uses: msys2/setup-msys2@v2
-        with:
-          update: true
-          msystem: ${{ matrix.msystem }}
-          install: >-
-            base-devel
-            git
-            autoconf
-            automake
-            libtool
-            ${{ matrix.toolchain }}
-      - name: Build
-        shell: msys2 {0}
-        run: |
-          autoreconf -i
-          ./configure \
-            --host=${{ matrix.CC }} \
-            --disable-docs \
-            --disable-maintainer-mode \
-            --disable-valgrind \
-            --with-oniguruma=builtin \
-            --disable-shared \
-            --enable-static \
-            --enable-all-static
-          make -j$(nproc)
-          file ./jq.exe
-          cp ./jq.exe jq-${{ env.SUFFIX }}.exe
-      - name: Test
-        # Only run tests for amd64 matching the CI machine arch
-        if: ${{ matrix.arch == 'amd64' }}
-        shell: msys2 {0}
-        run: |
-          make check
-          git diff --exit-code --ignore-submodules
-      - name: Upload Test Logs
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-logs-${{ env.SUFFIX }}
-          retention-days: 7
-          path: |
-            test-suite.log
-            tests/*.log
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: jq-windows
-          path: jq-${{ env.SUFFIX }}.exe
-          if-no-files-found: error
-          retention-days: 7
+  # windows:
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       arch:
+  #         - amd64
+  #         - i386
+  #       include:
+  #         - arch: amd64
+  #           CC: x86_64-pc-msys
+  #           toolchain: gcc
+  #           msystem: msys
+  #         - arch: i386
+  #           CC: i686-w64-mingw32
+  #           toolchain: mingw-w64-i686-toolchain
+  #           msystem: mingw32
+  #   runs-on: windows-2022
+  #   env:
+  #     CHOST: ${{ matrix.CC }}
+  #     CC: ${{ matrix.CC }}-gcc
+  #     LDFLAGS: -s
+  #     SUFFIX: windows-${{ matrix.arch }}
+  #   steps:
+  #     - name: Clone repository
+  #       uses: actions/checkout@v3
+  #       with:
+  #         submodules: true
+  #     - uses: msys2/setup-msys2@v2
+  #       with:
+  #         update: true
+  #         msystem: ${{ matrix.msystem }}
+  #         install: >-
+  #           base-devel
+  #           git
+  #           autoconf
+  #           automake
+  #           libtool
+  #           ${{ matrix.toolchain }}
+  #     - name: Build
+  #       shell: msys2 {0}
+  #       run: |
+  #         autoreconf -i
+  #         ./configure \
+  #           --host=${{ matrix.CC }} \
+  #           --disable-docs \
+  #           --disable-maintainer-mode \
+  #           --disable-valgrind \
+  #           --with-oniguruma=builtin \
+  #           --disable-shared \
+  #           --enable-static \
+  #           --enable-all-static
+  #         make -j$(nproc)
+  #         file ./jq.exe
+  #         cp ./jq.exe jq-${{ env.SUFFIX }}.exe
+  #     - name: Test
+  #       # Only run tests for amd64 matching the CI machine arch
+  #       if: ${{ matrix.arch == 'amd64' }}
+  #       shell: msys2 {0}
+  #       run: |
+  #         make check
+  #         git diff --exit-code --ignore-submodules
+  #     - name: Upload Test Logs
+  #       if: ${{ failure() }}
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: test-logs-${{ env.SUFFIX }}
+  #         retention-days: 7
+  #         path: |
+  #           test-suite.log
+  #           tests/*.log
+  #     - name: Upload artifacts
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: jq-windows
+  #         path: jq-${{ env.SUFFIX }}.exe
+  #         if-no-files-found: error
+  #         retention-days: 7
+  #
+  # dist:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Clone repository
+  #       uses: actions/checkout@v3
+  #       with:
+  #         submodules: true
+  #     - name: Install packages
+  #       run: |
+  #         sudo apt-get update -qq
+  #         sudo apt-get install -y automake autoconf
+  #     - name: Create dist
+  #       run: |
+  #         autoreconf -i
+  #         ./configure \
+  #           --disable-docs \
+  #           --disable-maintainer-mode \
+  #           --disable-valgrind \
+  #           --with-oniguruma=builtin
+  #         make distcheck
+  #         make dist dist-zip
+  #         git diff --exit-code
+  #     - name: Upload artifacts
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: jq-dist
+  #         if-no-files-found: error
+  #         retention-days: 7
+  #         path: |
+  #           jq-*.tar.gz
+  #           jq-*.zip
 
-  dist:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-      - name: Install packages
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y automake autoconf
-      - name: Create dist
-        run: |
-          autoreconf -i
-          ./configure \
-            --disable-docs \
-            --disable-maintainer-mode \
-            --disable-valgrind \
-            --with-oniguruma=builtin
-          make distcheck
-          make dist dist-zip
-          git diff --exit-code
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: jq-dist
-          if-no-files-found: error
-          retention-days: 7
-          path: |
-            jq-*.tar.gz
-            jq-*.zip
-
-  docker:
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-    needs: linux
-    if: startsWith(github.ref, 'refs/tags/jq-')
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
-      - name: Download executables
-        uses: actions/download-artifact@v3
-        with:
-          name: jq-linux
-      - name: Move executables
-        run: |
-          mkdir -p linux/{386,amd64,arm64,mips64le,ppc64le,riscv64,s390x}
-          mv jq-linux-i386 linux/386/jq
-          mv jq-linux-amd64 linux/amd64/jq
-          mv jq-linux-arm64 linux/arm64/jq
-          mv jq-linux-mips64el linux/mips64le/jq
-          mv jq-linux-ppc64el linux/ppc64le/jq
-          mv jq-linux-riscv64 linux/riscv64/jq
-          mv jq-linux-s390x linux/s390x/jq
-          chmod +x linux/*/jq
-      - name: Create Dockerfile
-        run: |
-          cat <<'EOF' >Dockerfile
-          FROM scratch
-          ARG TARGETPLATFORM
-          COPY AUTHORS COPYING $TARGETPLATFORM/jq /
-          RUN ["/jq", "--version"]
-          ENTRYPOINT ["/jq"]
-          EOF
-      - name: Docker metadata
-        uses: docker/metadata-action@v4
-        id: metadata
-        with:
-          images: ghcr.io/${{ github.repository }}
-          tags: type=match,pattern=jq-(.*),group=1,value=${{ github.ref_name }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and release Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          provenance: false
-          platforms: linux/386,linux/amd64,linux/arm64,linux/mips64le,linux/ppc64le,linux/riscv64,linux/s390x
-          tags: ${{ steps.metadata.outputs.tags }}
-          labels: ${{ steps.metadata.outputs.labels }}
-
-  release:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    needs: [linux, macos, windows, dist, docker]
-    if: startsWith(github.ref, 'refs/tags/jq-')
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-      - name: Upload release
-        env:
-          TAG_NAME: ${{ github.ref_name }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          sha256sum jq-*/jq-* | sed 's, .*/, ,' > checksums.txt
-          gh release create "$TAG_NAME" --draft --title "jq ${TAG_NAME#jq-}" --generate-notes
-          gh release upload "$TAG_NAME" --clobber jq-*/jq-* checksums.txt
+  # docker:
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     packages: write
+  #   needs: linux
+  #   if: startsWith(github.ref, 'refs/tags/jq-')
+  #   steps:
+  #     - name: Clone repository
+  #       uses: actions/checkout@v3
+  #     - name: Download executables
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: jq-linux
+  #     - name: Move executables
+  #       run: |
+  #         mkdir -p linux/{386,amd64,arm64,mips64le,ppc64le,riscv64,s390x}
+  #         mv jq-linux-i386 linux/386/jq
+  #         mv jq-linux-amd64 linux/amd64/jq
+  #         mv jq-linux-arm64 linux/arm64/jq
+  #         mv jq-linux-mips64el linux/mips64le/jq
+  #         mv jq-linux-ppc64el linux/ppc64le/jq
+  #         mv jq-linux-riscv64 linux/riscv64/jq
+  #         mv jq-linux-s390x linux/s390x/jq
+  #         chmod +x linux/*/jq
+  #     - name: Create Dockerfile
+  #       run: |
+  #         cat <<'EOF' >Dockerfile
+  #         FROM scratch
+  #         ARG TARGETPLATFORM
+  #         COPY AUTHORS COPYING $TARGETPLATFORM/jq /
+  #         RUN ["/jq", "--version"]
+  #         ENTRYPOINT ["/jq"]
+  #         EOF
+  #     - name: Docker metadata
+  #       uses: docker/metadata-action@v4
+  #       id: metadata
+  #       with:
+  #         images: ghcr.io/${{ github.repository }}
+  #         tags: type=match,pattern=jq-(.*),group=1,value=${{ github.ref_name }}
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v2
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v2
+  #     - name: Login to GitHub Container Registry
+  #       uses: docker/login-action@v2
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.repository_owner }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Build and release Docker image
+  #       uses: docker/build-push-action@v4
+  #       with:
+  #         context: .
+  #         push: true
+  #         provenance: false
+  #         platforms: linux/386,linux/amd64,linux/arm64,linux/mips64le,linux/ppc64le,linux/riscv64,linux/s390x
+  #         tags: ${{ steps.metadata.outputs.tags }}
+  #         labels: ${{ steps.metadata.outputs.labels }}
+  #
+  # release:
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: write
+  #   needs: [linux, macos, windows, dist, docker]
+  #   if: startsWith(github.ref, 'refs/tags/jq-')
+  #   steps:
+  #     - name: Clone repository
+  #       uses: actions/checkout@v3
+  #     - name: Download artifacts
+  #       uses: actions/download-artifact@v3
+  #     - name: Upload release
+  #       env:
+  #         TAG_NAME: ${{ github.ref_name }}
+  #         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       run: |
+  #         sha256sum jq-*/jq-* | sed 's, .*/, ,' > checksums.txt
+  #         gh release create "$TAG_NAME" --draft --title "jq ${TAG_NAME#jq-}" --generate-notes
+  #         gh release upload "$TAG_NAME" --clobber jq-*/jq-* checksums.txt

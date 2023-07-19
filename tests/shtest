@@ -420,7 +420,7 @@ if command -v script >/dev/null 2>&1; then
   if script -qc echo /dev/null 2>/dev/null; then
     faketty() { script -qec "$*" /dev/null; }
   else # macOS
-    faketty() { script -q /dev/null "$@" /dev/null; }
+    faketty() { script -q /dev/null "$@" /dev/null | sed 's/^\x5E\x44\x08\x08//'; }
   fi
 
   faketty $JQ -n . > $d/color
