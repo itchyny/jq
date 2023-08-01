@@ -199,7 +199,9 @@ static void jvp_invalid_free(jv x) {
 #include "jv_dtoa.h"
 #include "jv_dtoa_tsd.h"
 
+#include "decNumber/decimal64.h"
 // we will manage the space for the struct
+#undef DECNUMDIGITS
 #define DECNUMDIGITS 1
 #include "decNumber/decNumber.h"
 
@@ -563,17 +565,6 @@ typedef struct {
   decNumber num_decimal; // must be the last field in the structure for memory management
 } jvp_literal_number;
 
-typedef struct {
-  decNumber number;
-  decNumberUnit units[1];
-} decNumberSingle;
-
-typedef struct {
-  decNumber number;
-  decNumberUnit units[BIN64_DEC_PRECISION];
-} decNumberDoublePrecision;
-
-
 static inline int jvp_number_is_literal(jv n) {
   assert(JVP_HAS_KIND(n, JV_KIND_NUMBER));
   return JVP_HAS_FLAGS(n, JVP_FLAGS_NUMBER_LITERAL);
@@ -625,16 +616,12 @@ static jv jvp_literal_number_new(const char * literal) {
 static double jvp_literal_number_to_double(jv j) {
   assert(JVP_HAS_FLAGS(j, JVP_FLAGS_NUMBER_LITERAL));
 
-  decNumber *p_dec_number = jvp_dec_number_ptr(j);
-  decNumberDoublePrecision dec_double;
+  decNumber *pdec = jvp_dec_number_ptr(j);
+  decimal64 dec64;
+  decimal64FromNumber(&dec64, pdec, DEC_CONTEXT_TO_DOUBLE());
+
   char literal[BIN64_DEC_PRECISION + DEC_NUMBER_STRING_GUARD + 1];
-
-  // reduce the number to the shortest possible form
-  // while also making sure than no more than BIN64_DEC_PRECISION
-  // digits are used (dec_context_to_double)
-  decNumberReduce(&dec_double.number, p_dec_number, DEC_CONTEXT_TO_DOUBLE());
-
-  decNumberToString(&dec_double.number, literal);
+  decimal64ToString(&dec64, literal);
 
   char *end;
   return jvp_strtod(tsd_dtoa_context_get(), literal, &end);
@@ -764,15 +751,15 @@ int jvp_number_cmp(jv a, jv b) {
 
 #ifdef USE_DECNUM
   if (JVP_HAS_FLAGS(a, JVP_FLAGS_NUMBER_LITERAL) && JVP_HAS_FLAGS(b, JVP_FLAGS_NUMBER_LITERAL)) {
-    decNumberSingle res;
-    decNumberCompare(&res.number,
+    decNumber res;
+    decNumberCompare(&res,
                      jvp_dec_number_ptr(a),
                      jvp_dec_number_ptr(b),
                      DEC_CONTEXT()
                      );
-    if (decNumberIsZero(&res.number)) {
+    if (decNumberIsZero(&res)) {
       return 0;
-    } else if (decNumberIsNegative(&res.number)) {
+    } else if (decNumberIsNegative(&res)) {
       return -1;
     } else {
       return 1;
