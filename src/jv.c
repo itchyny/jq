@@ -199,9 +199,7 @@ static void jvp_invalid_free(jv x) {
 #include "jv_dtoa.h"
 #include "jv_dtoa_tsd.h"
 
-#include "decNumber/decimal64.h"
 // we will manage the space for the struct
-#undef DECNUMDIGITS
 #define DECNUMDIGITS 1
 #include "decNumber/decNumber.h"
 
@@ -217,8 +215,9 @@ enum {
 #define JVP_FLAGS_NUMBER_LITERAL      JVP_MAKE_FLAGS(JV_KIND_NUMBER, JVP_MAKE_PFLAGS(JVP_NUMBER_DECIMAL, 1))
 
 // the decimal precision of binary double
-#define BIN64_DEC_PRECISION  (17)
-#define DEC_NUMBER_STRING_GUARD (14)
+#define DEC_NUBMER_DOUBLE_PRECISION   (16)
+#define DEC_NUMBER_STRING_GUARD       (14)
+#define DEC_NUBMER_DOUBLE_EXTRA_UNITS ((DEC_NUBMER_DOUBLE_PRECISION - DECNUMDIGITS + DECDPUN - 1)/DECDPUN)
 
 #include "jv_thread.h"
 #ifdef WIN32
@@ -532,24 +531,20 @@ static decContext* tsd_dec_ctx_get(pthread_key_t *key) {
     return ctx;
   }
 
-  decContext _ctx = {
-      0,
-      DEC_MAX_EMAX,
-      DEC_MIN_EMAX,
-      DEC_ROUND_HALF_UP,
-      0, /*no errors*/
-      0, /*status*/
-      0, /*no clamping*/
-    };
-  if (key == &dec_ctx_key) {
-    _ctx.digits = DEC_MAX_DIGITS;
-  } else if (key == &dec_ctx_dbl_key) {
-    _ctx.digits = BIN64_DEC_PRECISION;
-  }
-
   ctx = malloc(sizeof(decContext));
   if (ctx) {
-    *ctx = _ctx;
+    if (key == &dec_ctx_key)
+    {
+      decContextDefault(ctx, DEC_INIT_BASE);
+      ctx->digits = DEC_MAX_DIGITS;
+      ctx->traps = 0; /*no errors*/
+    }
+    else if (key == &dec_ctx_dbl_key)
+    {
+      decContextDefault(ctx, DEC_INIT_DECIMAL64);
+      // just to make sure we got this right
+      assert(ctx->digits <= DEC_NUBMER_DOUBLE_PRECISION);
+    }
     if (pthread_setspecific(*key, ctx) != 0) {
       fprintf(stderr, "error: cannot store thread specific data");
       abort();
@@ -564,6 +559,12 @@ typedef struct {
   char * literal_data;
   decNumber num_decimal; // must be the last field in the structure for memory management
 } jvp_literal_number;
+
+typedef struct {
+  decNumber number;
+  decNumberUnit units[DEC_NUBMER_DOUBLE_EXTRA_UNITS];
+} decNumberDoublePrecision;
+
 
 static inline int jvp_number_is_literal(jv n) {
   assert(JVP_HAS_KIND(n, JV_KIND_NUMBER));
@@ -616,12 +617,15 @@ static jv jvp_literal_number_new(const char * literal) {
 static double jvp_literal_number_to_double(jv j) {
   assert(JVP_HAS_FLAGS(j, JVP_FLAGS_NUMBER_LITERAL));
 
-  decNumber *pdec = jvp_dec_number_ptr(j);
-  decimal64 dec64;
-  decimal64FromNumber(&dec64, pdec, DEC_CONTEXT_TO_DOUBLE());
+  decNumber *p_dec_number = jvp_dec_number_ptr(j);
+  decNumberDoublePrecision dec_double;
+  char literal[DEC_NUBMER_DOUBLE_PRECISION + DEC_NUMBER_STRING_GUARD + 1];
 
-  char literal[BIN64_DEC_PRECISION + DEC_NUMBER_STRING_GUARD + 1];
-  decimal64ToString(&dec64, literal);
+  // reduce the number to the shortest possible form
+  // that fits into the 64 bit floating point representation
+  decNumberReduce(&dec_double.number, p_dec_number, DEC_CONTEXT_TO_DOUBLE());
+
+  decNumberToString(&dec_double.number, literal);
 
   char *end;
   return jvp_strtod(tsd_dtoa_context_get(), literal, &end);
