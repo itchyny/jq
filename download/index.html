@@ -65,13 +65,13 @@ to make them executable first using <code>chmod +x jq</code>.</p>
 <p>jq is licensed under the MIT license. For all of the gory
 details, read the file <code>COPYING</code> in the source distribution.</p>
 <p>jq uses a C library for decimal number support. This is an ICU 1.8.1
-licensed code obtained from the ICU downloads archive
-http://download.icu-project.org/files/decNumber/decNumber-icu-368.zip.</p>
+licensed code obtained from the ICU downloads archive.<br />
+<a href="https://download.icu-project.org/files/decNumber/decNumber-icu-368.zip">https://download.icu-project.org/files/decNumber/decNumber-icu-368.zip</a></p>
 <h3>Linux</h3>
 <ul>
 <li>
 <p>jq is in the official <a href="https://packages.debian.org/jq">Debian</a> and
-   <a href="http://packages.ubuntu.com/jq">Ubuntu</a> repositories. Install using
+   <a href="https://packages.ubuntu.com/jq">Ubuntu</a> repositories. Install using
    <code>sudo apt-get install jq</code>.</p>
 </li>
 <li>
@@ -85,6 +85,14 @@ http://download.icu-project.org/files/decNumber/decNumber-icu-368.zip.</p>
 <li>
 <p>jq is in the official <a href="https://archlinux.org/packages/?q=jq">Arch</a> repository.
    Install using <code>sudo pacman -S jq</code>.</p>
+</li>
+<li>
+<p>jq 1.7.1 binaries for
+   <a href="https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-linux-amd64">AMD64</a>
+   or
+   <a href="https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-linux-arm64">ARM64</a>
+   or
+   <a href="https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-linux-i386">i386</a>.</p>
 </li>
 <li>
 <p>jq 1.7 binaries for
@@ -122,13 +130,19 @@ http://download.icu-project.org/files/decNumber/decNumber-icu-368.zip.</p>
 <h3>macOS</h3>
 <ul>
 <li>
-<p>Use <a href="http://brew.sh/">Homebrew</a> to install jq with <code>brew install jq</code>.</p>
+<p>Use <a href="https://brew.sh/">Homebrew</a> to install jq with <code>brew install jq</code>.</p>
 </li>
 <li>
 <p>Use <a href="https://www.macports.org">MacPorts</a> to install jq with <code>port install jq</code>.</p>
 </li>
 <li>
 <p>Use <a href="https://finkproject.org">Fink</a> to install jq with <code>fink install jq</code>.</p>
+</li>
+<li>
+<p>jq 1.7.1 binaries for
+   <a href="https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-macos-amd64">AMD64</a>
+   or
+   <a href="https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-macos-arm64">ARM64</a>.</p>
 </li>
 <li>
 <p>jq 1.7 binaries for
@@ -197,6 +211,12 @@ http://download.icu-project.org/files/decNumber/decNumber-icu-368.zip.</p>
    <code>chocolatey install jq</code>.</p>
 </li>
 <li>
+<p>jq 1.7.1 executables for
+   <a href="https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-windows-amd64.exe">AMD64</a>
+   or
+   <a href="https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-windows-i386.exe">i386</a>.</p>
+</li>
+<li>
 <p>jq 1.7 executables for
    <a href="https://github.com/jqlang/jq/releases/download/jq-1.7/jq-windows-amd64.exe">AMD64</a>
    or
@@ -231,6 +251,8 @@ http://download.icu-project.org/files/decNumber/decNumber-icu-368.zip.</p>
 <p>SHA-256 checksums are provided for all release and pre-release binaries.
 They can be found under
 <a href="https://github.com/jqlang/jq/tree/master/sig">sig/v1.x/sha256sum.txt</a>.
+The checksums for jq 1.7.1 are in
+<a href="https://raw.githubusercontent.com/jqlang/jq/master/sig/v1.7.1/sha256sum.txt">sig/v1.7.1/sha256sum.txt</a>.
 The checksums for jq 1.7 are in
 <a href="https://raw.githubusercontent.com/jqlang/jq/master/sig/v1.7/sha256sum.txt">sig/v1.7/sha256sum.txt</a>.
 The checksums for jq 1.6 are in
@@ -240,6 +262,8 @@ The checksums for jq 1.5 are in
 <p>Additionally, all release artifacts are signed by a jq release key.  We have two release keys, <a href="https://raw.githubusercontent.com/jqlang/jq/master/sig/jq-release-old.key">one for 1.6 and older releases</a>, and <a href="https://raw.githubusercontent.com/jqlang/jq/master/sig/jq-release-new.key">one for 1.7 and newer releases</a>.
 Signatures can be found under
 <a href="https://github.com/jqlang/jq/tree/master/sig">sig/v1.x/*.asc</a>.
+The signatures for jq 1.7.1 are in
+<a href="https://github.com/jqlang/jq/tree/master/sig/v1.7.1">sig/v1.7.1/*.asc</a>.
 The signatures for jq 1.7 are in
 <a href="https://github.com/jqlang/jq/tree/master/sig/v1.7">sig/v1.7/*.asc</a>.
 The signatures for jq 1.6 are in
@@ -250,6 +274,7 @@ You can use <a href="https://gnupg.org/">GnuPG</a> to verify a signature by down
 the signature and running <code>gpg --verify signature.asc</code>.</p>
 <h3>From source on Linux, macOS, Cygwin, and other POSIX-like operating systems</h3>
 <ul>
+<li><a href="https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-1.7.1.tar.gz">Source tarball for jq 1.7.1</a></li>
 <li><a href="https://github.com/jqlang/jq/releases/download/jq-1.7/jq-1.7.tar.gz">Source tarball for jq 1.7</a></li>
 <li><a href="https://github.com/jqlang/jq/releases/download/jq-1.6/jq-1.6.tar.gz">Source tarball for jq 1.6</a></li>
 <li><a href="https://github.com/jqlang/jq/releases/download/jq-1.5/jq-1.5.tar.gz">Source tarball for jq 1.5</a></li>
@@ -277,7 +302,7 @@ likely already installed.</p>
 <p>On macOS, these are all included in Apple's command line tools, which can
 be installed from <a href="https://developer.apple.com/xcode/">Xcode</a>. However,
 you may find that you need a newer version of Bison than the one provided
-by Apple. This can be found in <a href="http://brew.sh">Homebrew</a> or
+by Apple. This can be found in <a href="https://brew.sh/">Homebrew</a> or
 <a href="https://macports.org/">MacPorts</a>.</p>
 <p>If you want to generate the lexer and parser from source you can use the
 <code>--enable-maintainer-mode</code> configure flag. This requires bison to be installed.
