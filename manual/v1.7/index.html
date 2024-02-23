@@ -1019,7 +1019,7 @@ outputs produced by the left expression, and then all of the
 outputs produced by the right. For instance, filter <code>.foo,
 .bar</code>, produces both the "foo" fields and "bar" fields as
 separate outputs.</p>
-<p>The <code>,</code> operator is one way to contruct generators.</p>
+<p>The <code>,</code> operator is one way to construct generators.</p>
             <div class="pb-3">
               <button type="button" class="btn btn-sm btn-secondary text-body-secondary bg-transparent link-body-emphasis border-0" data-bs-toggle="collapse" data-bs-target="#example7" aria-expanded="false" aria-controls="example7">
                 <span class="me-1 d-print-none" aria-hidden="true"><span class="bi bi-chevron-right"></span><span class="bi bi-chevron-down"></span></span>Examples
@@ -2030,7 +2030,7 @@ at all.</p>
 that the former simply forms an array from all the values of
 <code>($x|f)</code> for each value, $x, in the input array or object,
 but <code>map_values(f)</code> only uses <code>first($x|f)</code>.</p>
-<p>Specifically, for object inputs, <code>map_value(f)</code> constructs
+<p>Specifically, for object inputs, <code>map_values(f)</code> constructs
 the output object by examining in turn the value of
 <code>first(.[$k]|f)</code> for each key, $k, of the input.  If this
 expression produces no values, then the corresponding key
@@ -7994,7 +7994,7 @@ in <code>.jq</code>.</p>
 <p>Modules imported by a program are searched for in a default search
 path (see below).  The <code>import</code> and <code>include</code> directives allow the
 importer to alter this path.</p>
-<p>Paths in the a search path are subject to various substitutions.</p>
+<p>Paths in the search path are subject to various substitutions.</p>
 <p>For paths starting with <code>~/</code>, the user's home directory is
 substituted for <code>~</code>.</p>
 <p>For paths starting with <code>$ORIGIN/</code>, the directory where the jq

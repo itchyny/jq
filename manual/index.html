@@ -108,6 +108,9 @@
             <a class="nav-link" href="#assignment">Assignment</a>
           </li>
           <li class="nav-item" data-bs-dismiss="offcanvas" data-bs-target="#contents">
+            <a class="nav-link" href="#comments">Comments</a>
+          </li>
+          <li class="nav-item" data-bs-dismiss="offcanvas" data-bs-target="#contents">
             <a class="nav-link" href="#modules">Modules</a>
           </li>
           <li class="nav-item" data-bs-dismiss="offcanvas" data-bs-target="#contents">
@@ -290,7 +293,7 @@ using some command-line options:</p>
 <li><code>-f filename</code> / <code>--from-file filename</code>:</li>
 </ul>
 <p>Read filter from the file rather than from a command line, like
-  awk's -f option. You can also use '#' to make comments.</p>
+  awk's -f option.</p>
 <ul>
 <li><code>-L directory</code>:</li>
 </ul>
@@ -1018,7 +1021,7 @@ outputs produced by the left expression, and then all of the
 outputs produced by the right. For instance, filter <code>.foo,
 .bar</code>, produces both the "foo" fields and "bar" fields as
 separate outputs.</p>
-<p>The <code>,</code> operator is one way to contruct generators.</p>
+<p>The <code>,</code> operator is one way to construct generators.</p>
             <div class="pb-3">
               <button type="button" class="btn btn-sm btn-secondary text-body-secondary bg-transparent link-body-emphasis border-0" data-bs-toggle="collapse" data-bs-target="#example7" aria-expanded="false" aria-controls="example7">
                 <span class="me-1 d-print-none" aria-hidden="true"><span class="bi bi-chevron-right"></span><span class="bi bi-chevron-down"></span></span>Examples
@@ -2029,7 +2032,7 @@ at all.</p>
 that the former simply forms an array from all the values of
 <code>($x|f)</code> for each value, $x, in the input array or object,
 but <code>map_values(f)</code> only uses <code>first($x|f)</code>.</p>
-<p>Specifically, for object inputs, <code>map_value(f)</code> constructs
+<p>Specifically, for object inputs, <code>map_values(f)</code> constructs
 the output object by examining in turn the value of
 <code>first(.[$k]|f)</code> for each key, $k, of the input.  If this
 expression produces no values, then the corresponding key
@@ -7986,6 +7989,61 @@ that we did before:</p>
 </code></pre>
           </section>
         </section>
+        <section id="comments">
+          <h2>Comments <a href="#comments" class="icon-link" aria-label="Link to this section: Comments"><span class="bi bi-link-45deg" aria-hidden="true"></span></a></h2>
+          <p>You can write comments in your jq filters using <code>#</code>.</p>
+<p>A <code>#</code> character (not part of a string) starts a comment.
+All characters from <code>#</code> to the end of the line are ignored.</p>
+<p>If the end of the line is preceded by an odd number of backslash
+characters, the following line is also considered part of the
+comment and is ignored.</p>
+<p>For example, the following code outputs <code>[1,3,4,7]</code></p>
+<pre><code>[
+  1,
+  # foo \
+  2,
+  # bar \\
+  3,
+  4, # baz \\\
+  5, \
+  6,
+  7
+  # comment \
+    comment \
+    comment
+]
+</code></pre>
+<p>Backslash continuing the comment on the next line can be useful
+when writing the "shebang" for a jq script:</p>
+<pre><code>#!/bin/sh --
+# total - Output the sum of the given arguments (or stdin)
+# usage: total [numbers...]
+# \
+exec jq --args -MRnf "$0" -- "$@"
+
+$ARGS.positional |
+reduce (
+  if . == []
+    then inputs
+    else .[]
+  end |
+  . as $dot |
+  try tonumber catch false |
+  if not or isnan then
+    @json "total: Invalid number \($dot).\n" | halt_error(1)
+  end
+) as $n (0; . + $n)
+</code></pre>
+<p>The <code>exec</code> line is considered a comment by jq, so it is ignored.
+But it is not ignored by <code>sh</code>, since in <code>sh</code> a backslash at the
+end of the line does not continue the comment.
+With this trick, when the script is invoked as <code>total 1 2</code>,
+<code>/bin/sh -- /path/to/total 1 2</code> will be run, and <code>sh</code> will then
+run <code>exec jq --args -MRnf /path/to/total -- 1 2</code> replacing itself
+with a <code>jq</code> interpreter invoked with the specified options (<code>-M</code>,
+<code>-R</code>, <code>-n</code>, <code>--args</code>), that evaluates the current file (<code>$0</code>),
+with the arguments (<code>$@</code>) that were passed to <code>sh</code>.</p>
+        </section>
         <section id="modules">
           <h2>Modules <a href="#modules" class="icon-link" aria-label="Link to this section: Modules"><span class="bi bi-link-45deg" aria-hidden="true"></span></a></h2>
           <p>jq has a library/module system.  Modules are files whose names end
@@ -7993,7 +8051,7 @@ in <code>.jq</code>.</p>
 <p>Modules imported by a program are searched for in a default search
 path (see below).  The <code>import</code> and <code>include</code> directives allow the
 importer to alter this path.</p>
-<p>Paths in the a search path are subject to various substitutions.</p>
+<p>Paths in the search path are subject to various substitutions.</p>
 <p>For paths starting with <code>~/</code>, the user's home directory is
 substituted for <code>~</code>.</p>
 <p>For paths starting with <code>$ORIGIN/</code>, the directory where the jq
@@ -8295,6 +8353,7 @@ by a semi-colon, where the first number is one of these:</p>
         "Plain assignment: =": "plain-assignment",
         "Complex assignments": "complex-assignments",
         "Assignment": "assignment",
+        "Comments": "comments",
         "import RelativePathString as NAME [\u003cmetadata\u003e];": "import-relativepathstring-as-name",
         "include RelativePathString [\u003cmetadata\u003e];": "include-relativepathstring",
         "import RelativePathString as $NAME [\u003cmetadata\u003e];": "import-relativepathstring-as-$name",
