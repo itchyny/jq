@@ -238,6 +238,8 @@ jobs:
           cp ./jq.exe jq-${{ env.SUFFIX }}.exe
       - name: Test
         run: |
+          echo '"2038-01-19T03:14:08Z"' | ./jq fromdate || true
+          echo '1435677542.822351' | ./jq 'strftime("%A, %B %e, %Y")' || true
           make check VERBOSE=yes
           git diff --exit-code
       - name: Upload Test Logs
