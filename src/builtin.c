@@ -1477,7 +1477,7 @@ static time_t my_mktime(struct tm *tm) {
     return t;
   return t + tm->__tm_gmtoff;
 #elif WIN32
-  return _mkgmtime(tm);
+  return _mkgmtime64(tm);
 #else
   char *tz;
 
