@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - remove-optional-test
     tags:
       - "jq-*"
   pull_request:
