@@ -1789,6 +1789,7 @@ static jv f_strftime(jq_state *jq, jv a, jv b) {
 #endif
   jv_free(b);
   /* POSIX doesn't provide errno values for strftime() failures; weird */
+  printf("%ld, %d, %ld\n", n, *fmt != '\0', max_size);
   if ((n == 0 && *fmt) || n > max_size) {
     free(buf);
     return jv_invalid_with_msg(jv_string("strftime/1: unknown system failure"));
