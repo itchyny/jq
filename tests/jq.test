@@ -1810,8 +1810,6 @@ try ["OK", bsearch(0)] catch ["KO",.]
 "aa"
 ["KO","string (\"aa\") cannot be searched from"]
 
-# strptime tests are in optional.test
-
 strftime("%Y-%m-%dT%H:%M:%SZ")
 [2015,2,5,23,51,47,4,63]
 "2015-03-05T23:51:47Z"
@@ -1853,6 +1851,26 @@ try ["OK", strftime([])] catch ["KO", .]
 try ["OK", strflocaltime({})] catch ["KO", .]
 0
 ["KO","strflocaltime/1 requires a string format"]
+
+[strptime("%Y-%m-%dT%H:%M:%SZ")|(.,mktime)]
+"2015-03-05T23:51:47Z"
+[[2015,2,5,23,51,47,4,63],1425599507]
+
+# Check day-of-week and day of year computations
+# (should trip an assert if this fails)
+# This date range
+last(range(365 * 67)|("1970-03-01T01:02:03Z"|strptime("%Y-%m-%dT%H:%M:%SZ")|mktime) + (86400 * .)|strftime("%Y-%m-%dT%H:%M:%SZ")|strptime("%Y-%m-%dT%H:%M:%SZ"))
+null
+[2037,1,11,1,2,3,3,41]
+
+# Regression test for #3276
+fromdate
+"2038-01-19T03:14:08Z"
+2147483648
+
+strftime("%A, %B %e, %Y")
+1435677542.822351
+"Tuesday, June 30, 2015"
 
 # module system
 import "a" as foo; import "b" as bar; def fooa: foo::a; [fooa, bar::a, bar::b, foo::a]
