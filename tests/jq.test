@@ -1981,9 +1981,9 @@ null
 "string (\"xxxxxxxx☆☆☆☆☆...\") cannot be negated"
 "string (\"xxxxxxxxxx☆☆☆☆...\") cannot be negated"
 
-try (. + "x") catch . == if have_decnum then "number (12345678901234567890123456...) and string (\"x\") cannot be added" else "number (12345678901234568000000000...) and string (\"x\") cannot be added" end
+try (. + "x") catch .
 123456789012345678901234567890
-true
+"number (12345678901234567890123456...) and string (\"x\") cannot be added"
 
 join(",")
 ["1",2,true,false,3.4]
