@@ -1377,7 +1377,7 @@ static jv f_string_implode(jq_state *jq, jv a) {
       return type_error(n, "can't be imploded, unicode codepoint needs to be numeric");
     }
 
-    int nv = jv_number_value(n);
+    int nv = jvp_dtoi(jv_number_value(n));
     jv_free(n);
     // outside codepoint range or in utf16 surrogate pair range
     if (nv < 0 || nv > 0x10FFFF || (nv >= 0xD800 && nv <= 0xDFFF))
@@ -1647,8 +1647,7 @@ static int jv2tm(jv a, struct tm *tm, int localtime) {
     double d = jv_number_value(n);
     if (i == 0) /* year */
       d -= 1900;
-    *(int *)((void *)tm + offsets[i]) = d < INT_MIN ? INT_MIN :
-                                        d > INT_MAX ? INT_MAX : (int)d;
+    *(int *)((void *)tm + offsets[i]) = jvp_dtoi(d);
     jv_free(n);
   }
 

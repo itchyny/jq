@@ -43,6 +43,7 @@
 
 #include "jv_alloc.h"
 #include "jv.h"
+#include "jv_private.h"
 #include "jv_unicode.h"
 #include "util.h"
 
@@ -1424,7 +1425,7 @@ jv jv_string_implode(jv j) {
   for (i = 0; i < len; i++) {
     jv n = jv_array_get(jv_copy(j), i);
     assert(JVP_HAS_KIND(n, JV_KIND_NUMBER));
-    int nv = jv_number_value(n);
+    int nv = jvp_dtoi(jv_number_value(n));
     jv_free(n);
     // outside codepoint range or in utf16 surrogate pair range
     if (nv < 0 || nv > 0x10FFFF || (nv >= 0xD800 && nv <= 0xDFFF))

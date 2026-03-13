@@ -90,10 +90,7 @@ jv jv_get(jv t, jv k) {
       jv_free(t);
       v = jv_null();
     } else {
-      double didx = jv_number_value(k);
-      if (didx < INT_MIN) didx = INT_MIN;
-      if (didx > INT_MAX) didx = INT_MAX;
-      int idx = (int)didx;
+      int idx = jvp_dtoi(jv_number_value(k));
       if (idx < 0)
         idx += jv_array_length(jv_copy(t));
       v = jv_array_get(t, idx);
@@ -162,11 +159,8 @@ jv jv_set(jv t, jv k, jv v) {
       jv_free(v);
       t = jv_invalid_with_msg(jv_string("Cannot set array element at NaN index"));
     } else {
-      double didx = jv_number_value(k);
-      if (didx < INT_MIN) didx = INT_MIN;
-      if (didx > INT_MAX) didx = INT_MAX;
       if (isnull) t = jv_array();
-      t = jv_array_set(t, (int)didx, v);
+      t = jv_array_set(t, jvp_dtoi(jv_number_value(k)), v);
       jv_free(k);
     }
   } else if (jv_get_kind(k) == JV_KIND_OBJECT &&
@@ -246,7 +240,7 @@ jv jv_has(jv t, jv k) {
       jv_free(t);
       ret = jv_false();
     } else {
-      jv elem = jv_array_get(t, (int)jv_number_value(k));
+      jv elem = jv_array_get(t, jvp_dtoi(jv_number_value(k)));
       ret = jv_bool(jv_is_valid(elem));
       jv_free(elem);
     }
@@ -309,7 +303,7 @@ static jv jv_dels(jv t, jv keys) {
     for (int i = 0; i < len; ++i) {
       int del = 0;
       while (neg_idx < jv_array_length(jv_copy(neg_keys))) {
-        int delidx = len + (int)jv_number_get_value_and_consume(jv_array_get(jv_copy(neg_keys), neg_idx));
+        int delidx = len + jvp_dtoi(jv_number_get_value_and_consume(jv_array_get(jv_copy(neg_keys), neg_idx)));
         if (i == delidx) {
           del = 1;
         }
@@ -319,7 +313,7 @@ static jv jv_dels(jv t, jv keys) {
         neg_idx++;
       }
       while (nonneg_idx < jv_array_length(jv_copy(nonneg_keys))) {
-        int delidx = (int)jv_number_get_value_and_consume(jv_array_get(jv_copy(nonneg_keys), nonneg_idx));
+        int delidx = jvp_dtoi(jv_number_get_value_and_consume(jv_array_get(jv_copy(nonneg_keys), nonneg_idx)));
         if (i == delidx) {
           del = 1;
         }
@@ -329,8 +323,8 @@ static jv jv_dels(jv t, jv keys) {
         nonneg_idx++;
       }
       for (int sidx=0; !del && sidx<jv_array_length(jv_copy(starts)); sidx++) {
-        if ((int)jv_number_get_value_and_consume(jv_array_get(jv_copy(starts), sidx)) <= i &&
-            i < (int)jv_number_get_value_and_consume(jv_array_get(jv_copy(ends), sidx))) {
+        if (jvp_dtoi(jv_number_get_value_and_consume(jv_array_get(jv_copy(starts), sidx))) <= i &&
+            i < jvp_dtoi(jv_number_get_value_and_consume(jv_array_get(jv_copy(ends), sidx)))) {
           del = 1;
         }
       }
