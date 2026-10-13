@@ -99,8 +99,6 @@ struct lexer_param;
 %precedence FUNCDEF
 %right '|'
 %left ','
-%right "//"
-%nonassoc '=' SETPIPE SETPLUS SETMINUS SETMULT SETDIV SETMOD SETDEFINEDOR
 %left OR
 %left AND
 %nonassoc NEQ EQ '<' '>' LESSEQ GREATEREQ
@@ -113,7 +111,7 @@ struct lexer_param;
 %precedence "catch"
 
 
-%type <blk> Query Expr Term
+%type <blk> Query Expr DefinedOrExpr BinExpr Term
 %type <blk> DictPairs DictPair DictExpr
 %type <blk> ElseBody
 %type <blk> String QQString
@@ -345,70 +343,80 @@ Expr {
 
 
 Expr:
-Expr "//" Expr {
-  $$ = gen_definedor($1, $3);
+DefinedOrExpr {
+  $$ = $1;
 } |
-Expr '=' Expr {
+BinExpr '=' BinExpr {
   $$ = gen_call("_assign", BLOCK(gen_lambda($1), gen_lambda($3)));
 } |
-Expr "or" Expr {
-  $$ = gen_or($1, $3);
-} |
-Expr "and" Expr {
-  $$ = gen_and($1, $3);
-} |
-Expr "//=" Expr {
+BinExpr "//=" BinExpr {
   $$ = gen_definedor_assign($1, $3);
 } |
-Expr "|=" Expr {
+BinExpr "|=" BinExpr {
   $$ = gen_call("_modify", BLOCK(gen_lambda($1), gen_lambda($3)));
 } |
-Expr '+' Expr {
-  $$ = gen_binop($1, $3, '+');
-} |
-Expr "+=" Expr {
+BinExpr "+=" BinExpr {
   $$ = gen_update($1, $3, '+');
 } |
-Expr '-' Expr {
-  $$ = gen_binop($1, $3, '-');
-} |
-Expr "-=" Expr {
+BinExpr "-=" BinExpr {
   $$ = gen_update($1, $3, '-');
 } |
-Expr '*' Expr {
-  $$ = gen_binop($1, $3, '*');
-} |
-Expr "*=" Expr {
+BinExpr "*=" BinExpr {
   $$ = gen_update($1, $3, '*');
 } |
-Expr '/' Expr {
-  $$ = gen_binop($1, $3, '/');
-} |
-Expr '%' Expr {
-  $$ = gen_binop($1, $3, '%');
-} |
-Expr "/=" Expr {
+BinExpr "/=" BinExpr {
   $$ = gen_update($1, $3, '/');
 } |
-Expr SETMOD Expr {
+BinExpr SETMOD BinExpr {
   $$ = gen_update($1, $3, '%');
+}
+
+DefinedOrExpr:
+BinExpr "//" DefinedOrExpr {
+  $$ = gen_definedor($1, $3);
 } |
-Expr "==" Expr {
+BinExpr {
+  $$ = $1;
+}
+
+BinExpr:
+BinExpr "or" BinExpr {
+  $$ = gen_or($1, $3);
+} |
+BinExpr "and" BinExpr {
+  $$ = gen_and($1, $3);
+} |
+BinExpr '+' BinExpr {
+  $$ = gen_binop($1, $3, '+');
+} |
+BinExpr '-' BinExpr {
+  $$ = gen_binop($1, $3, '-');
+} |
+BinExpr '*' BinExpr {
+  $$ = gen_binop($1, $3, '*');
+} |
+BinExpr '/' BinExpr {
+  $$ = gen_binop($1, $3, '/');
+} |
+BinExpr '%' BinExpr {
+  $$ = gen_binop($1, $3, '%');
+} |
+BinExpr "==" BinExpr {
   $$ = gen_binop($1, $3, EQ);
 } |
-Expr "!=" Expr {
+BinExpr "!=" BinExpr {
   $$ = gen_binop($1, $3, NEQ);
 } |
-Expr '<' Expr {
+BinExpr '<' BinExpr {
   $$ = gen_binop($1, $3, '<');
 } |
-Expr '>' Expr {
+BinExpr '>' BinExpr {
   $$ = gen_binop($1, $3, '>');
 } |
-Expr "<=" Expr {
+BinExpr "<=" BinExpr {
   $$ = gen_binop($1, $3, LESSEQ);
 } |
-Expr ">=" Expr {
+BinExpr ">=" BinExpr {
   $$ = gen_binop($1, $3, GREATEREQ);
 } |
 Term %prec NONOPT {
@@ -673,14 +681,14 @@ FORMAT {
   FAIL(@$, "Possibly unterminated 'if' statement");
   $$ = $2;
 } |
-"try" Expr "catch" Expr {
+"try" BinExpr "catch" BinExpr {
   $$ = gen_try($2, $4);
 } |
-"try" Expr "catch" error {
+"try" BinExpr "catch" error {
   FAIL(@$, "Possibly unterminated 'try' statement");
   $$ = $2;
 } |
-"try" Expr {
+"try" BinExpr {
   $$ = gen_try($2, gen_op_simple(BACKTRACK));
 } |
 /*

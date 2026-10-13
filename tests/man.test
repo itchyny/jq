@@ -828,6 +828,10 @@ null
 42
 1
 
+.a = (.b // 42)
+{}
+{"a":42}
+
 try .a catch ". is not an object"
 true
 ". is not an object"

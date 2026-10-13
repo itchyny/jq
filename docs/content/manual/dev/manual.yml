@@ -2556,6 +2556,12 @@ sections:
           value other `false` and `null`, the default `42` is not
           produced.
 
+          The `//` operator cannot be combined with an assignment
+          operator (`=`, `|=`, `+=`, `-=`, `*=`, `/=`, `%=`, or `//=`)
+          without parentheses.  Write `.a = (.b // 42)` to assign the
+          default value, or `(.a = .b) // 42` if the default applies
+          to the result of the assignment.
+
         examples:
           - program: 'empty // 42'
             input: 'null'
@@ -2572,6 +2578,9 @@ sections:
           - program: '(false, null, 1) | . // 42'
             input: 'null'
             output: ['42', '42', '1']
+          - program: '.a = (.b // 42)'
+            input: '{}'
+            output: ['{"a":42}']
 
       - title: try-catch
         body: |

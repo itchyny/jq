@@ -1397,6 +1397,35 @@ null
 ["hello",true,false,[false],null]
 ["hello",true,"hello",[false],"hello"]
 
+# Alternative and assignment operators require parentheses to be combined #3507
+[.a = (.b // 1), (.a = .b) // 1, .a // .b // 2, .c += (.b // 1)]
+{"b":null,"c":1}
+[{"b":null,"c":1,"a":1},{"b":null,"c":1,"a":null},2,{"b":null,"c":2}]
+
+%%FAIL
+.a = .b // 1
+jq: error: syntax error, unexpected //, expecting end of file at <top-level>, line 1, column 9:
+    .a = .b // 1
+            ^^
+
+%%FAIL
+.a // .b = 1
+jq: error: syntax error, unexpected '=', expecting end of file at <top-level>, line 1, column 10:
+    .a // .b = 1
+             ^
+
+%%FAIL
+.a |= . // 1
+jq: error: syntax error, unexpected //, expecting end of file at <top-level>, line 1, column 9:
+    .a |= . // 1
+            ^^
+
+%%FAIL
+.a // .b |= 1
+jq: error: syntax error, unexpected |=, expecting end of file at <top-level>, line 1, column 10:
+    .a // .b |= 1
+             ^^
+
 .[] | [.[0] and .[1], .[0] or .[1]]
 [[true,[]], [false,1], [42,null], [null,false]]
 [true,true]

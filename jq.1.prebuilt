@@ -2701,6 +2701,9 @@ This is useful for providing defaults: \fB\.foo // 1\fR will evaluate to \fB1\fR
 .P
 Note: \fBsome_generator // defaults_here\fR is not the same as \fBsome_generator | \. // defaults_here\fR\. The latter will produce default values for all non\-\fBfalse\fR, non\-\fBnull\fR values of the left\-hand side, while the former will not\. Precedence rules can make this confusing\. For example, in \fBfalse, 1 // 2\fR the left\-hand side of \fB//\fR is \fB1\fR, not \fBfalse, 1\fR \-\- \fBfalse, 1 // 2\fR parses the same way as \fBfalse, (1 // 2)\fR\. In \fB(false, null, 1) | \. // 42\fR the left\-hand side of \fB//\fR is \fB\.\fR, which always produces just one value, while in \fB(false, null, 1) // 42\fR the left\-hand side is a generator of three values, and since it produces a value other \fBfalse\fR and \fBnull\fR, the default \fB42\fR is not produced\.
 .
+.P
+The \fB//\fR operator cannot be combined with an assignment operator (\fB=\fR, \fB|=\fR, \fB+=\fR, \fB\-=\fR, \fB*=\fR, \fB/=\fR, \fB%=\fR, or \fB//=\fR) without parentheses\. Write \fB\.a = (\.b // 42)\fR to assign the default value, or \fB(\.a = \.b) // 42\fR if the default applies to the result of the assignment\.
+.
 .IP "" 4
 .
 .nf
@@ -2724,6 +2727,10 @@ jq \'(false, null, 1) // 42\'
 jq \'(false, null, 1) | \. // 42\'
    null
 => 42, 42, 1
+
+jq \'\.a = (\.b // 42)\'
+   {}
+=> {"a":42}
 .
 .fi
 .
